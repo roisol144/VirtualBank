@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: solo6755
+      POSTGRES_DB: postgres
+    ports:
+      - "5433:5432"  # PostgreSQL accessible on host port 5433
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistent storage for PostgreSQL
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile  
+    environment:
+      DATABASE_URL: postgres://postgres:solo6755@postgres:5432/postgres  # Corrected connection string
+    ports:
+      - "8000:8000"  # Port mapping for your app
+    depends_on:
+      - postgres  
+
+volumes:
+  postgres_data:
