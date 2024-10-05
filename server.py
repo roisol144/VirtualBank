@@ -1,34 +1,23 @@
 from flask import Flask, jsonify
 import psycopg2
+import os
 from psycopg2 import OperationalError
 from users import users_bp  # Import the Blueprint from users.py(for the APIs handlers)
+from db import get_db_connection 
 
 
 app = Flask(__name__)
-
+# Load secret key from environment variable
+#sapp.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'fallback-secret')
 # Register the Blueprint with the Flask app
 app.register_blueprint(users_bp)
 
-# Database params
-DB_USER = 'postgres'
-DB_PASSWORD = 'solo6755'
-DB_HOST = 'postgres'  
-DB_PORT = '5432'      
-DB_NAME = 'postgres'
-
 def check_database_connection():
-    try:
-        conn = psycopg2.connect(
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            host=DB_HOST,
-            port=DB_PORT
-        )
+    cursor, conn = get_db_connection()
+    if conn:
         conn.close()
         return True
-    except OperationalError:
-        return False
+    return False
 
 @app.route('/status', methods=['GET'])
 def status():

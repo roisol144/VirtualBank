@@ -18,6 +18,7 @@ services:
       dockerfile: Dockerfile  
     environment:
       DATABASE_URL: postgres://postgres:solo6755@postgres:5432/postgres  # Corrected connection string
+      SECRET_KEY: 548e8b4c21dd14004171f1b8502cbba3eebf74151bb5e60575e4f0866e59e4bb # Generated secret key
     ports:
       - "8000:8000"  # Port mapping for your app
     depends_on:
