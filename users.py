@@ -1,21 +1,26 @@
 from flask import Blueprint, request, jsonify
 import psycopg2
+import logging
+from psycopg2.errors import UniqueViolation
 from flask_bcrypt import Bcrypt
 from auth_utils import generate_token
 from uuid import uuid4
 import datetime
 from db import get_db_connection, get_user_by_email
-from auth_utils import token_required # Toekn validation function
 import re
-import secrets
+from exceptions import DatabaseConnectionError, UserNotFoundError
 
+# logging config
+logging.basicConfig(level=logging.DEBUG, 
+                    format='%(asctime)s - %(levelname)s - %(message)s',
+                    handlers=[logging.FileHandler("app.log"), logging.StreamHandler()])
 # Create a Blueprint for users
 users_bp = Blueprint('users', __name__)
 bcrypt = Bcrypt()
 
     
-@users_bp.route('/users', methods=['POST'])
-def create_user():
+@users_bp.route('/register', methods=['POST'])
+def register():
     data = request.get_json()
     
     # Input validation 
@@ -45,52 +50,54 @@ def create_user():
         # psycopg2 sql injection
         cursor, conn = get_db_connection()
         if cursor is None or conn is None:
-            return jsonify({'error' : 'Failed to connect to server' }), 500
+            return jsonify({'error' : 'Internal Error' }), 500
         
-        # Checking if a user with this email already exists
-        cursor.execute("SELECT id FROM users WHERE email = %s", (email,))
-        existing_user = cursor.fetchone()
-        if existing_user:
-            cursor.close()
-            conn.close()
-            return jsonify({'error' : 'User with this email already exist!'}), 409
-
         cursor.execute("""
             INSERT INTO users (id, first_name, last_name, email, password_hash, created_at, updated_at) 
             VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
         """, (user_id, data['first_name'], data['last_name'], email, hashed_password, str(created_at), str(updated_at)))
+        
         conn.commit() 
         cursor.close()
         conn.close()
-        # more error hanlding regarding - like "user already exist"
+
     except Exception as e:
-        return jsonify({'error': 'Error creating a new user'}), 500
+        logging.debug("Error creating user: ", exc_info=True)
+        return jsonify({'error': 'Internal Error'}), 500
+    
+    except UniqueViolation as UV:
+        logging.debug(f"Unique constraint violation for email {email}: {UV}")
+        return jsonify({'error': 'Try another email.'}), 409
 
     # Return the created user data
     return jsonify({'id': user_id, 'first_name': data['first_name'], 'last_name': data['last_name'], 'email': data['email']}), 201
 
-# Get All Users
-@users_bp.route('/users', methods=['GET'])
-def get_users():
-    # Retrieve users from the database (handle database exceptions)
-    try:
-        cursor, conn = get_db_connection()
-        if cursor is None or conn is None:
-            return jsonify({'Error' : 'Failed to connect to server' }), 500
-    
-        cursor.execute("SELECT id, first_name, last_name, email FROM users;")
-        users = cursor.fetchall()
-        cursor.close()
-        conn.close()
+# Get User
+@users_bp.route('/get_user', methods=['GET']) 
+def get_user():
+    #data = request.get_json() 
+    email = request.args.get('email') 
 
-        # Return a list of users
-        return jsonify([
-            {'id': user['id'], 'first_name': user['first_name'], 'last_name': user['last_name'], 'email': user['email']}
-            for user in users
-        ]), 200
-    except Exception as e:
-        return jsonify({'error': 'General error'}), 500
+    if not email:
+        logging.error("Email not provided", exc_info=True)
+        return jsonify({'error': "'email' is required."}), 400
+
+    try:
+        user = get_user_by_email(email)  
+        return jsonify({
+            'id': user['id'],
+            'first_name': user['first_name'],
+            'last_name': user['last_name'],
+            'email': user['email']
+        }), 200
     
+    except UserNotFoundError as e:
+        return jsonify({'error': 'User Not Found'}), 404
+    except DatabaseConnectionError as e:
+        logging.error("Couldn't connect to server", exc_info=True)
+        return jsonify({'error': 'Internal Error'}), 500
+    except Exception as e:
+        return jsonify({'error': 'An unexpected error occurred.'}), 500
 
 @users_bp.route('/login', methods=['POST'])
 def login():
@@ -100,19 +107,12 @@ def login():
     user = get_user_by_email(email) # Get USER
 
     if user and bcrypt.check_password_hash(user['password_hash'], password):
+        login_time = datetime.datetime.now()
         token = generate_token(user['id'])
-        
+        logging.debug(f"user with email {email} logged in at {login_time}...")
         return jsonify({
             'message': 'Logged In Successfully',
-            'auth_token': token
+            'toekn': token
         }), 200
     else:
         return jsonify({'error': 'Invalid email or password.'}), 401
-
-# testing auth process
-@users_bp.route('/auth', methods=['GET'])
-@token_required    
-def checkAuth(current_user_id): 
-    return jsonify({'message': 'Access granted to protected route', 'user id': current_user_id}), 200
-    
-        
