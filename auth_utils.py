@@ -8,7 +8,7 @@ from cryptography.fernet import Fernet
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 # Keys
-ferney_key = os.environ.get("FERNET_KEY")
+ferney_key = os.environ.get('FERNET_KEY')
 fernet = Fernet(ferney_key.encode())
 TOKEN_EXPIRATION_HOURS = os.environ.get('TOKEN_EXPIRATION_HOURS')
 
