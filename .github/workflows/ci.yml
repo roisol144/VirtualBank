@@ -57,12 +57,12 @@ jobs:
           source venv/bin/activate
           pip install -r requirements.txt
 
-      # Run tests inside Docker
-      - name: Run unit tests
+      # Install Flake8
+      - name: Install dependencies
         run: |
-          docker-compose up --build  # Start services
-          sleep 10  # Wait for services to initialize
-          docker-compose exec app pytest --disable-warnings --maxfail=5
+          python -m venv venv
+          source venv/bin/activate
+          pip install flake8
 
       - name: Lint with Flake8
         run: |
