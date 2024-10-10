@@ -1,0 +1,63 @@
+name: CI Pipeline
+
+# Run the pipeline on pushes and pull requests to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: solo6755
+          POSTGRES_DB: postgres
+        ports:
+          - 5433:5432  # Expose PostgreSQL on the port you're using
+        options: >-
+          --health-cmd "pg_isready -U postgres" 
+          --health-interval 10s 
+          --health-timeout 5s 
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://postgres:solo6755@postgres:5432/postgres
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      FERNET_KEY: ${{ secrets.FERNET_KEY }}
+
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Set up Python environment
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+
+      # Run tests inside Docker
+      - name: Run unit tests
+        run: |
+          docker-compose up -d  # Start services
+          sleep 10  # Wait for services to initialize
+          docker-compose exec app pytest --disable-warnings --maxfail=5
+
+      - name: Lint with Flake8
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
