@@ -32,6 +32,7 @@ jobs:
       DATABASE_URL: postgres://postgres:solo6755@postgres:5432/postgres
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       FERNET_KEY: ${{ secrets.FERNET_KEY }}
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
 
     steps:
       # Checkout the code from the repository
