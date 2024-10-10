@@ -56,11 +56,7 @@ def get_bank_accounts():
 def create_bank_account():
     data = request.get_json()
     user_id = data['user_id']
-    # required_fields = ['user_id', 'type', 'currency']
     
-    # for field in required_fields:
-    #     if field not in data or not data[field].strip():
-    #         return jsonify({'error': f'the field {field} is missing'}), 400
     try:
         user_id = check_is_valid_user_id(str(data['user_id']))
         if not user_id:
