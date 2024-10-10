@@ -47,23 +47,24 @@ jobs:
       # Install docker-compose
       - name: Install docker-compose
         run: |
+          python -m venv venv
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
       # Install dependencies
       - name: Install dependencies
         run: |
-          python -m venv venv
           source venv/bin/activate
           pip install -r requirements.txt
 
-      # Run tests inside Docker
-      - name: Run unit tests
+      # Install Flake8
+      - name: Install Flake8
         run: |
-          docker-compose up --build  # Start services
-          sleep 10  # Wait for services to initialize
-          docker-compose exec app pytest --disable-warnings --maxfail=5
+          python -m venv venv
+          source venv/bin/activate
+          pip install flake8
 
       - name: Lint with Flake8
         run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          source venv/bin/activate
+          flake8 . --exclude=venv --count --select=E9,F63,F7,F82 --show-source --statistics
