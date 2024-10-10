@@ -1,6 +1,5 @@
 name: CI Pipeline
 
-# Run the pipeline on pushes and pull requests to the 'main' branch
 on:
   push:
     branches:
@@ -12,7 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:16
@@ -32,17 +31,24 @@ jobs:
       DATABASE_URL: postgres://postgres:solo6755@postgres:5432/postgres
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       FERNET_KEY: ${{ secrets.FERNET_KEY }}
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: 'true'
 
     steps:
       # Checkout the code from the repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Set up Python environment
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+
+      # Install docker-compose
+      - name: Install docker-compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
 
       # Install dependencies
       - name: Install dependencies
