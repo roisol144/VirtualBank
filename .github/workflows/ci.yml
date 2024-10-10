@@ -35,6 +35,12 @@ jobs:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: true
 
     steps:
+      # Set up Node.js 20 explicitly
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'  # Set Node.js version to 20 explicitly
+          
       # Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
