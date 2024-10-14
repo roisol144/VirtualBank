@@ -10,7 +10,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # Keys
 ferney_key = os.environ.get('FERNET_KEY')
 fernet = Fernet(ferney_key.encode())
-TOKEN_EXPIRATION_HOURS = os.environ.get('TOKEN_EXPIRATION_HOURS')
+TOKEN_EXPIRATION_HOURS = int(os.environ.get('TOKEN_EXPIRATION_HOURS'))
 
 # logging config
 logging.basicConfig(level=logging.DEBUG, 

@@ -19,7 +19,7 @@ users_bp = Blueprint('users', __name__)
 bcrypt = Bcrypt()
 
     
-@users_bp.route('/register', methods=['POST'])
+@users_bp.route('/users/register', methods=['POST'])
 def register():
     data = request.get_json()
     
@@ -33,6 +33,7 @@ def register():
     email = data['email'].strip().lower() # email - not case sensitive, without spaces
     email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     if not re.match(email_regex, email):
+        logging.debug("Email format is invalid.")
         return jsonify({'error:', 'Invalid email format'}), 400
 
     password = data['password'].strip()
@@ -73,7 +74,7 @@ def register():
     return jsonify({'id': user_id, 'first_name': data['first_name'], 'last_name': data['last_name'], 'email': data['email']}), 201
 
 # Get User
-@users_bp.route('/get_user', methods=['GET']) 
+@users_bp.route('/users', methods=['GET']) 
 def get_user():
     #data = request.get_json() 
     email = request.args.get('email') 
@@ -99,7 +100,7 @@ def get_user():
     except Exception as e:
         return jsonify({'error': 'An unexpected error occurred.'}), 500
 
-@users_bp.route('/login', methods=['POST'])
+@users_bp.route('/users/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = data.get('email')

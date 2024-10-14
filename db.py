@@ -4,7 +4,8 @@ import logging
 from psycopg2 import DatabaseError, OperationalError
 from urllib.parse import urlparse
 from psycopg2.extras import RealDictCursor
-from exceptions import UserNotFoundError, DatabaseConnectionError
+from exceptions import UserNotFoundError, DatabaseConnectionError, AccountNotFoundError
+from auth_utils import encrypt_account_number
 
 # logging config
 logging.basicConfig(level=logging.DEBUG, 
@@ -13,7 +14,11 @@ logging.basicConfig(level=logging.DEBUG,
 
 
 def get_db_connection():
-    db_url = os.getenv('DATABASE_URL')
+    if os.getenv('FLASK_ENV') == 'TEST':
+        db_url = os.getenv('TEST_DATABASE_URL')
+    else:
+        db_url = os.getenv('DATABASE_URL')
+        
     try:
         conn = psycopg2.connect(db_url)
         cursor = conn.cursor(cursor_factory=RealDictCursor)
@@ -83,3 +88,53 @@ def check_is_valid_user_id(user_id):
         if conn:
             conn.close()
     
+def check_is_valid_account_number(account_number):
+    try:
+        cursor, conn = get_db_connection()
+        if cursor is None or conn is None:
+            raise DatabaseConnectionError("Failed to connect")
+        
+        encrypted_account_number = encrypt_account_number(account_number)
+        cursor.execute("SELECT * FROM bank_accounts WHERE account_number = %s", (str(encrypted_account_number),))
+        account = cursor.fetchone()
+        if not account:
+            raise AccountNotFoundError(f"No account found with number {account_number}")
+        
+        account_id = account['id']
+        return account_id
+    
+    except DatabaseConnectionError as e:
+        logging.error("Database connection error:", exc_info=True)
+        raise
+    
+    except AccountNotFoundError as e:
+        logging.error(f"Account not found: {str(e)}", exc_info=True)
+        raise
+    
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def get_account_id_by_user_id(user_id):
+    try:
+        cursor, conn = get_db_connection()
+        if cursor is None or conn is None:
+            raise DatabaseConnectionError("Failed to connect to db.")
+        
+        cursor.execute("SELECT id FROM bank_accounts WHERE user_id = %s", (user_id,))
+        result = cursor.fetchone()
+        
+        if result:
+            return result['id']
+        else:
+            return None
+    except Exception as e:
+        logging.error(f"Error in get_account_id_by_user_id: {str(e)}", exc_info=True)
+        return None
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()

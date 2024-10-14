@@ -13,6 +13,7 @@ from exceptions import TokenVerificationError
 
 app = Flask(__name__)
 
+
 logging.basicConfig(level=logging.DEBUG, 
                     format='%(asctime)s - %(levelname)s - %(message)s',
                     handlers=[logging.FileHandler("app.log"), logging.StreamHandler()])
@@ -35,29 +36,33 @@ def log_reponse_info(response):
 
 # protected/non-protected routes
 open_routes = {
-    ('/login', 'POST'): 'login',
-    ('/register', 'POST'): 'register',
-    ('/create_bank_account', 'POST'): 'create_bank_account'
+    ('/users/login', 'POST'): 'login',
+    ('/users/register', 'POST'): 'register',
+    ('/bank_accounts', 'POST'): 'create_bank_account'
     }
 
 closed_routes = {
-    ('/get_user', 'GET'): 'get_user',
-    ('/bank_accounts', 'GET') : 'get_bank_account'
+    ('/users', 'GET'): 'get_user',
+    ('/bank_accounts', 'GET') : 'get_bank_account',
+    ('/bank_accounts/transfer', 'POST') : 'transfer'
 }
 
 # Middleware for token auth
 @app.before_request
 def auth_token():
-    # Normalize the request path (strip any trailing slashes) and lowercase it for comparison
     request_path = request.path.rstrip('/').lower()
-    request_key = (request_path, request.method)
+    request_method = request.method
+    request_key = (request_path, request_method)
     logging.debug(f"Request key: {request_key}")
+    logging.debug(f"Open routes: {open_routes}")
+    logging.debug(f"Closed routes: {closed_routes}")
+    logging.debug(f"All registered routes: {[str(rule) for rule in app.url_map.iter_rules()]}")
     
-    # check if there's a match between path and method
     if request_key in open_routes:
+        logging.debug(f"Matched open route: {request_key}")
         return
-
     elif request_key in closed_routes:
+        logging.debug(f"Matched closed route: {request_key}")
         auth_header = request.headers.get('Authorization')
         
         if not auth_header:
@@ -91,9 +96,11 @@ def auth_token():
                 return jsonify({'error': 'Authentication failed'}), 401
             
         # incase there are more than two parts to the auth_parts
+        # After meeting this part of code is redudant 
+        # Delete after this part after inserting role as part of the token 
+        # For later use
         elif scheme == 'token':
             token = auth_parts[1]
-            # For later use
             role = auth_parts[2] if len(auth_parts) > 2 else None
             
             try:
@@ -112,7 +119,7 @@ def auth_token():
             return jsonify({'error': 'Unsupported authorization scheme.'})    
 
     else: # route not in open/close routes
-        logging.debug("Route doesn't exist.")
+        logging.debug(f"Route not found: {request_key}")
         return jsonify({'error': 'Not Found'}), 404
                 
 
