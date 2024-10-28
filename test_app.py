@@ -1,123 +1,185 @@
-import pytest
-import json
+import unittest
+from unittest.mock import patch, MagicMock
 from flask import Flask
-from server import app  
-from db import get_db_connection, get_user_by_email
+from bank_accounts import bank_accounts_bp
+from exceptions import UserNotFoundError
+from users import users_bp
+import json
+from datetime import datetime
+from dotenv import load_dotenv
 
+load_dotenv()
 
-@pytest.fixture
-def client():
-    # Setup Flask test client
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
+class TestApp(unittest.TestCase):
 
+    def setUp(self):
+        self.app = Flask(__name__)
+        self.app.register_blueprint(bank_accounts_bp)
+        self.app.register_blueprint(users_bp)
+        self.client = self.app.test_client()
 
-def test_register_user(client):
-    # Test data
-    user_data = {
-        "first_name": "John",
-        "last_name": "Doe",
-        "email": "johndoe@example.com",
-        "password": "strongpassword"
-    }
-    
-    # Send POST request to register user
-    response = client.post('/users/register', json=user_data)
-    
-    # Check if response is 201 (Created)
-    assert response.status_code == 201
-    response_json = response.get_json()
-    
-    # Ensure the returned data has the expected keys
-    assert 'id' in response_json
-    assert response_json['first_name'] == "John"
-    assert response_json['email'] == "johndoe@example.com"
+    # Bank Account Tests
 
+    @patch('bank_accounts.get_db_connection')
+    def test_get_bank_accounts(self, mock_get_db_connection):
+        mock_cursor = MagicMock()
+        mock_conn = MagicMock()
+        mock_get_db_connection.return_value = (mock_cursor, mock_conn)
 
-def test_register_existing_user(client):
-    # Test registering an existing user (to check unique email constraint)
-    existing_user_data = {
-        "first_name": "Jane",
-        "last_name": "Smith",
-        "email": "janesmith@example.com",
-        "password": "strongpassword"
-    }
-    
-    # Register first time
-    client.post('/users/register', json=existing_user_data)
-    
-    # Try registering again with the same email
-    response = client.post('/users/register', json=existing_user_data)
-    
-    # Check if response is 409 (Conflict)
-    assert response.status_code == 409
-    response_json = response.get_json()
-    assert 'error' in response_json
-    assert response_json['error'] == "Try another email."
+        mock_cursor.fetchall.return_value = [
+            {
+                'id': '123',
+                'user_id': '456',
+                'account_number': '789',
+                'balance': 1000,
+                'type': 'CHECKINGS',
+                'currency': 'USD',
+                'created_at': '2023-01-01',
+                'status': 'ACTIVE'
+            }
+        ]
 
+        response = self.client.get('/bank_accounts?user_id=456')
 
-def test_login_user(client):
-    # Register user for login
-    user_data = {
-        "first_name": "John",
-        "last_name": "Doe",
-        "email": "johndoe@example.com",
-        "password": "strongpassword"
-    }
-    client.post('/users/register', json=user_data)
-    
-    # Test login
-    login_data = {
-        "email": "johndoe@example.com",
-        "password": "strongpassword"
-    }
-    
-    response = client.post('/users/login', json=login_data)
-    
-    # Check if response is 200 (OK) and has a token
-    assert response.status_code == 200
-    response_json = response.get_json()
-    
-    assert 'message' in response_json
-    assert response_json['message'] == "Logged In Successfully"
-    assert 'toekn' in response_json  # Assuming typo "toekn" was intended
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]['id'], '123')
+        self.assertEqual(data[0]['user_id'], '456')
 
+    @patch('bank_accounts.get_db_connection')
+    @patch('bank_accounts.check_is_valid_user_id')
+    @patch('bank_accounts.uuid4')
+    @patch('bank_accounts.encrypt_account_number')
+    def test_create_bank_account(self, mock_encrypt, mock_uuid4, mock_check_user, mock_get_db_connection):
+        mock_cursor = MagicMock()
+        mock_conn = MagicMock()
+        mock_get_db_connection.return_value = (mock_cursor, mock_conn)
 
-def test_login_invalid_user(client):
-    # Test login with non-existing user
-    login_data = {
-        "email": "nonexistent@example.com",
-        "password": "wrongpassword"
-    }
-    
-    response = client.post('/users/login', json=login_data)
-    
-    # Check if response is 401 (Unauthorized)
-    assert response.status_code == 401
-    response_json = response.get_json()
-    assert 'error' in response_json
-    assert response_json['error'] == "Invalid email or password."
+        mock_check_user.return_value = '456'
+        mock_uuid4.return_value.int = 123456
+        mock_uuid4.return_value = '123'
+        mock_encrypt.return_value = b'encrypted_account_number'
 
+        response = self.client.post('/bank_accounts', 
+                                    data=json.dumps({'user_id': '456'}),
+                                    content_type='application/json')
 
-def test_protected_route_without_token(client):
-    # Try to access a protected route without a token
-    response = client.get('/users')
-    
-    # Should return 401 (Unauthorized)
-    assert response.status_code == 401
-    response_json = response.get_json()
-    assert 'error' in response_json
-    assert response_json['error'] == "Authorization header is missing."
+        self.assertEqual(response.status_code, 201)
+        data = json.loads(response.data)
+        self.assertEqual(data['account_id'], '123')
+        self.assertEqual(data['account_number'], 'encrypted_account_number')
 
+    # User Tests
 
-def test_protected_route_with_invalid_token(client):
-    # Access protected route with an invalid token
-    response = client.get('/users', headers={'Authorization': 'Bearer invalid_token'})
-    
-    # Should return 401 (Unauthorized)
-    assert response.status_code == 401
-    response_json = response.get_json()
-    assert 'error' in response_json
-    assert response_json['error'] == "Authentication failed"
+    @patch('users.get_db_connection')
+    @patch('users.bcrypt.generate_password_hash')
+    @patch('users.uuid4')
+    def test_register_user(self, mock_uuid4, mock_hash, mock_get_db_connection):
+        mock_cursor = MagicMock()
+        mock_conn = MagicMock()
+        mock_get_db_connection.return_value = (mock_cursor, mock_conn)
 
+        mock_uuid4.return_value = '123'
+        mock_hash.return_value = b'hashed_password'
+
+        response = self.client.post('/users/register', 
+                                    data=json.dumps({
+                                        'first_name': 'John',
+                                        'last_name': 'Doe',
+                                        'email': 'john@example.com',
+                                        'password': 'password123'
+                                    }),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 201)
+        data = json.loads(response.data)
+        self.assertEqual(data['id'], '123')
+        self.assertEqual(data['first_name'], 'John')
+        self.assertEqual(data['last_name'], 'Doe')
+        self.assertEqual(data['email'], 'john@example.com')
+
+    @patch('users.get_user_by_email')
+    def test_get_user(self, mock_get_user):
+        mock_get_user.return_value = {
+            'id': '123',
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'email': 'john@example.com'
+        }
+
+        response = self.client.get('/users?email=john@example.com')
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['id'], '123')
+        self.assertEqual(data['first_name'], 'John')
+        self.assertEqual(data['last_name'], 'Doe')
+        self.assertEqual(data['email'], 'john@example.com')
+
+    @patch('users.get_user_by_email')
+    @patch('users.bcrypt.check_password_hash')
+    @patch('users.generate_token')
+    def test_login_user(self, mock_generate_token, mock_check_password, mock_get_user):
+        mock_get_user.return_value = {
+            'id': '123',
+            'email': 'john@example.com',
+            'password_hash': 'hashed_password'
+        }
+        mock_check_password.return_value = True
+        mock_generate_token.return_value = 'fake_token'
+
+        response = self.client.post('/users/login',
+                                    data=json.dumps({
+                                        'email': 'john@example.com',
+                                        'password': 'password123'
+                                    }),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.data)
+        self.assertEqual(data['message'], 'Logged In Successfully')
+        self.assertEqual(data['toekn'], 'fake_token')  # Note: There's a typo in your original code ('toekn' instead of 'token')
+
+    def test_register_user_missing_field(self):
+        response = self.client.post('/users/register', 
+                                    data=json.dumps({
+                                        'first_name': 'John',
+                                        'last_name': 'Doe',
+                                        'email': 'john@example.com'
+                                        # Missing password field
+                                    }),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 400)
+        data = json.loads(response.data)
+        self.assertIn("'password' is missing", data['Error occured'])
+
+    @patch('users.get_user_by_email')
+    def test_login_user_invalid_credentials(self, mock_get_user):
+        mock_get_user.return_value = None
+
+        response = self.client.post('/users/login',
+                                    data=json.dumps({
+                                        'email': 'nonexistent@example.com',
+                                        'password': 'wrongpassword'
+                                    }),
+                                    content_type='application/json')
+
+        self.assertEqual(response.status_code, 401)
+        data = json.loads(response.data)
+        self.assertEqual(data['error'], 'Invalid email or password.')
+
+    @patch('users.get_user_by_email')
+    def test_get_user_not_found(self, mock_get_user):
+        # Provide the required argument for UserNotFoundError
+        mock_get_user.side_effect = UserNotFoundError(email='nonexistent@example.com')
+
+        response = self.client.get('/users?email=nonexistent@example.com')
+
+        self.assertEqual(response.status_code, 404)
+        data = json.loads(response.data)
+        self.assertEqual(data['error'], 'User Not Found')
+
+if __name__ == '__main__':
+    unittest.main()

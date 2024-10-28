@@ -2,16 +2,34 @@ from flask import Blueprint, request, jsonify, g
 import logging
 from flask_bcrypt import Bcrypt
 from db import get_db_connection, get_user_by_email, check_is_valid_user_id, check_is_valid_account_number, get_account_id_by_user_id
-from exceptions import UserNotFoundError, DatabaseConnectionError, InsufficientFundsError
+from exceptions import UserNotFoundError, DatabaseConnectionError, InsufficientFundsError, AccountNotFoundError
 from uuid import uuid4
 import datetime
 import os
 from auth_utils import encrypt_account_number
+import hashlib
+from enum import Enum
+
 
 # logging config
 logging.basicConfig(level=logging.DEBUG, 
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     handlers=[logging.FileHandler("app.log"), logging.StreamHandler()])
+
+class AccountType(Enum):
+    CHECKINGS = 'CHECKINGS'
+    SAVINGS = 'SAVINGS'
+    BUSINESS = 'BUSINESS'
+    
+class Currency(Enum):
+    USD = 'USD'
+    EUR = 'EUR'
+    GBP = 'GBP'
+class Status(Enum):
+    ACTIVE = 'ACTIVE'
+    SUSPENDED = 'SUSPENDED'
+    CLOSED = 'CLOSED'
+    
 
 
 # Create a Blueprint for users
@@ -64,14 +82,15 @@ def create_bank_account():
 
         # Required params
         account_id = str(uuid4())
-        account_number = str(uuid4().int)[:6]
+        account_number = str(int(uuid4()))[:6]
+        logging.debug(f"Account number: {account_number}")
+        hashed_account_number = hashlib.sha256(account_number.encode()).hexdigest()
         encrypted_account_number = encrypt_account_number(account_number).decode('utf-8')
-        currency = 'USD'
+        currency = Currency.USD.value
         balance = 2000
-        account_type = 'CHECKINGS'
+        account_type = AccountType.CHECKINGS.value
         created_at = datetime.datetime.now()
-        status = 'ACTIVE'
-         # ABOVE ADD ENUMS like a expection
+        status = Status.ACTIVE.value
         
         cursor, conn = get_db_connection()
         if cursor is None or conn is None:
@@ -81,9 +100,9 @@ def create_bank_account():
         conn.autocommit = True
         
         cursor.execute("""
-            INSERT INTO bank_accounts (id, user_id, account_number, balance, type, currency, created_at, status) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
-        """, (account_id, user_id, encrypted_account_number, balance, account_type, currency, created_at, status))
+            INSERT INTO bank_accounts (id, user_id, account_number, balance, type, currency, created_at, status, hashed_account_number) 
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
+        """, (account_id, user_id, encrypted_account_number, balance, account_type, currency, created_at, status, hashed_account_number))
         cursor.close()
         conn.close()
             
@@ -105,17 +124,29 @@ def transfer():
     logging.debug(f"Request JSON: {request.get_json()}")
     
     data = request.get_json()
-    to_account_number = data['to_account_number']
-    amount = data['amount']
-    transaction_type = data['transcation_type']  # Note: Typo in 'transaction'
-    from_account_id = get_account_id_by_user_id(g.current_user_id)
-    logging.debug(f"From account ID: {from_account_id}")
+    transfer_id = str(uuid4())
+    to_account_number = data.get('to_account_number')
+    amount = data.get('amount')
+    transaction_type = data.get('transaction_type')
+    logging.debug(f"Parsed data: transfer_id={transfer_id}, to_account_number={to_account_number}, amount={amount}, transaction_type={transaction_type}")
 
     
-    if amount <= 0:
-        return jsonify({'error': 'Amount must be positive'}), 400
+    # Validate input data
+    if not amount or not isinstance(amount, (int, float)):
+        return jsonify({'error': 'Invalid amount'}), 400
+    if not transaction_type or transaction_type not in ['WITHDRAW', 'DEPOSIT']:
+        return jsonify({'error': 'Invalid transaction type'}), 400
     
     try:
+        from_account_id = get_account_id_by_user_id(g.current_user_id)
+        logging.debug(f"From account ID: {from_account_id}")
+        
+        if not from_account_id:
+            raise AccountNotFoundError("Account not found for the current user")
+        
+        if amount <= 0:
+            return jsonify({'error': 'Amount must be positive'}), 400
+        
         cursor, conn = get_db_connection()
         if cursor is None or conn is None:
             raise DatabaseConnectionError("Failed to connect to db.")
@@ -126,8 +157,8 @@ def transfer():
         cursor.execute("SELECT balance FROM bank_accounts WHERE id = %s", (from_account_id,))
         sender_account = cursor.fetchone()
         if not sender_account:
-            raise ValueError("Sender's account not found")
-        
+            raise AccountNotFoundError("Sender's account not found")
+
         sender_balance = sender_account['balance']
         
         if sender_balance < amount:
@@ -148,23 +179,21 @@ def transfer():
             cursor.execute("UPDATE bank_accounts SET balance = balance - %s WHERE id = %s", (amount, from_account_id))
             cursor.execute("UPDATE bank_accounts SET balance = balance + %s WHERE id = %s", (amount, receiver_account_id))
             to_account_id = receiver_account_id
-        else:
-            raise ValueError("Invalid transaction type")
         
         cursor.execute("""
-                       INSERT INTO transactions (from_account_id, to_account_id, amount, transaction_type, transaction_date) 
-                       VALUES (%s, %s, %s, %s, %s)""",
-                       (from_account_id, to_account_id, amount, transaction_type, datetime.datetime.now()))
+                       INSERT INTO transactions (id, from_account, to_account, amount, type, transaction_date) 
+                       VALUES (%s, %s, %s, %s, %s, %s)""",
+                       (transfer_id, from_account_id, to_account_id, amount, transaction_type, datetime.datetime.now()))
         
         return jsonify({'message': 'Transfer successful'}), 200
 
-    except (DatabaseConnectionError, InsufficientFundsError, ValueError) as e:
+    except (DatabaseConnectionError, InsufficientFundsError, ValueError, AccountNotFoundError) as e:
         logging.error(f"Error in transfer: {str(e)}", exc_info=True)
         if conn:
             conn.rollback()
         return jsonify({'error': str(e)}), 400
     except Exception as e:
-        logging.error("Unexpected error in transfer", exc_info=True)
+        logging.error(f"Unexpected error in transfer: {str(e)}", exc_info=True)
         if conn:
             conn.rollback()
         return jsonify({'error': 'Internal Error'}), 500
@@ -173,8 +202,3 @@ def transfer():
             cursor.close()
         if conn:
             conn.close()
-            
-
-
-
-

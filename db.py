@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 from psycopg2.extras import RealDictCursor
 from exceptions import UserNotFoundError, DatabaseConnectionError, AccountNotFoundError
 from auth_utils import encrypt_account_number
+import hashlib
 
 # logging config
 logging.basicConfig(level=logging.DEBUG, 
@@ -93,9 +94,10 @@ def check_is_valid_account_number(account_number):
         cursor, conn = get_db_connection()
         if cursor is None or conn is None:
             raise DatabaseConnectionError("Failed to connect")
-        
-        encrypted_account_number = encrypt_account_number(account_number)
-        cursor.execute("SELECT * FROM bank_accounts WHERE account_number = %s", (str(encrypted_account_number),))
+        # Here change the encrypted with the hashed account number - hash it and then search for it inside the db
+        hashed_account_number = hashlib.sha256(account_number.encode()).hexdigest()
+        logging.debug(f"Hashed account number: {hashed_account_number}")
+        cursor.execute("SELECT * FROM bank_accounts WHERE hashed_account_number = %s", (hashed_account_number,))
         account = cursor.fetchone()
         if not account:
             raise AccountNotFoundError(f"No account found with number {account_number}")
@@ -109,7 +111,7 @@ def check_is_valid_account_number(account_number):
     
     except AccountNotFoundError as e:
         logging.error(f"Account not found: {str(e)}", exc_info=True)
-        raise
+        raise AccountNotFoundError(f"No account found with number {account_number}")
     
     finally:
         if cursor:
@@ -130,8 +132,11 @@ def get_account_id_by_user_id(user_id):
             return result['id']
         else:
             return None
-    except Exception as e:
-        logging.error(f"Error in get_account_id_by_user_id: {str(e)}", exc_info=True)
+    except DatabaseConnectionError:
+        logging.error(f"Database connection error: {user_id}", exc_info=True)
+        return None
+    except AccountNotFoundError:
+        logging.error(f"Account not found for user: {user_id}", exc_info=True)
         return None
     finally:
         if cursor:

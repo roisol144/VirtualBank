@@ -27,6 +27,11 @@ app.register_blueprint(bank_accounts_bp)
 def log_request_info():
     g.start_time = time.time()
     logging.info(f"New Request: TYPE: {request.method}, PATH: {request.path}, TIME:{g.start_time}")
+    logging.info(f"Headers: {request.headers}")
+    if hasattr(g, 'current_user_id'):
+        logging.debug(f"Current user ID: {g.current_user_id}")
+    else:
+        logging.debug("No current user ID set")
 
 @app.after_request
 def log_reponse_info(response):

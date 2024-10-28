@@ -4,6 +4,9 @@
 # Vim swap files
 *.swp
 
+# logs
+*.log
+
 # Python cache
 __pycache__/
 .pytest_cache/
