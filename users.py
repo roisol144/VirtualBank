@@ -50,15 +50,11 @@ def register():
     try:
         # psycopg2 sql injection
         cursor, conn = get_db_connection()
-        if cursor is None or conn is None:
-            return jsonify({'error' : 'Internal Error' }), 500
         
         cursor.execute("""
             INSERT INTO users (id, first_name, last_name, email, password_hash, created_at, updated_at) 
             VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
         """, (user_id, data['first_name'], data['last_name'], email, hashed_password, str(created_at), str(updated_at)))
-        
-        conn.commit() 
         cursor.close()
         conn.close()
 
@@ -103,9 +99,24 @@ def get_user():
 @users_bp.route('/users/login', methods=['POST'])
 def login():
     data = request.get_json()
+    
+    # Input validation
+    if not data or 'email' not in data or 'password' not in data:
+        return jsonify({'error': 'Email and password are required.'}), 400
+    
     email = data.get('email')
     password = data.get('password')
-    user = get_user_by_email(email) # Get USER
+
+    try:
+        user = get_user_by_email(email)  # Get USER
+    except UserNotFoundError:
+        return jsonify({'error': 'User Not Found'}), 404
+    except DatabaseConnectionError:
+        logging.error("Couldn't connect to server", exc_info=True)
+        return jsonify({'error': 'Internal Error'}), 500
+    except Exception as e:
+        logging.error("An unexpected error occurred", exc_info=True)
+        return jsonify({'error': 'An unexpected error occurred.'}), 500
 
     if user and bcrypt.check_password_hash(user['password_hash'], password):
         login_time = datetime.datetime.now()
@@ -113,7 +124,7 @@ def login():
         logging.debug(f"user with email {email} logged in at {login_time}...")
         return jsonify({
             'message': 'Logged In Successfully',
-            'toekn': token
+            'token': token  
         }), 200
     else:
         return jsonify({'error': 'Invalid email or password.'}), 401

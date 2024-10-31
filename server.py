@@ -42,12 +42,12 @@ def log_reponse_info(response):
 # protected/non-protected routes
 open_routes = {
     ('/users/login', 'POST'): 'login',
-    ('/users/register', 'POST'): 'register',
-    ('/bank_accounts', 'POST'): 'create_bank_account'
+    ('/users/register', 'POST'): 'register'
     }
 
 closed_routes = {
     ('/users', 'GET'): 'get_user',
+    ('/bank_accounts', 'POST'): 'create_bank_account',
     ('/bank_accounts', 'GET') : 'get_bank_account',
     ('/bank_accounts/transfer', 'POST') : 'transfer'
 }

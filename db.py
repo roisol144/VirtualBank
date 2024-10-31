@@ -22,19 +22,15 @@ def get_db_connection():
         
     try:
         conn = psycopg2.connect(db_url)
+        conn.autocommit = True 
         cursor = conn.cursor(cursor_factory=RealDictCursor)
         return cursor, conn
     except Exception as e:
         logging.error("Failed to connect to DB.", exc_info=True)
-        return None, None
-    
+        raise DatabaseConnectionError("Could not connect to DB.")    
 def get_user_by_email(email):
     try:
         cursor, conn = get_db_connection()
-        if cursor is None or conn is None:
-            raise DatabaseConnectionError("No connection to DB.")
-            logging.debug("No connection to the database.")
-            return None
 
         cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
         user = cursor.fetchone()
@@ -44,14 +40,10 @@ def get_user_by_email(email):
         conn.close()
         return user
     
-    except OperationalError as e:
-        logging.error(f"An error occured when trying to fetch user.", exc_info=True)
+    
+    except DatabaseConnectionError as e:
         raise DatabaseConnectionError("Failed to connect to the db")
 
-    except DatabaseError as e:
-            logging.error("Database error:", exc_info=True)
-            raise DatabaseConnectionError("An error occurred while fetching user.")
-        
     except Exception as e:
         logging.debug(f"Error fetching user by email: {email}", exc_info=True)
         return None

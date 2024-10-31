@@ -41,9 +41,6 @@ def get_bank_accounts():
     user_id = request.args.get('user_id')
     try:
         cursor, conn = get_db_connection()
-        if cursor is None or conn is None:
-            logging.debug("Couldn't connect to db.")
-            return jsonify({'error' : 'Internal Error' }), 500
         
         cursor.execute('SELECT * FROM bank_accounts WHERE user_id = %s', (user_id,))
         bank_accounts = cursor.fetchall()
@@ -70,6 +67,9 @@ def get_bank_accounts():
         logging.debug("General Error occured.")
         return jsonify({'error': 'Internal Error'}), 500
     
+    except DatabaseConnectionError as e:
+        return jsonify({'error': 'Internal Error'}), 500
+    
 @bank_accounts_bp.route('/bank_accounts', methods=['POST'])
 def create_bank_account():
     data = request.get_json()
@@ -84,20 +84,16 @@ def create_bank_account():
         account_id = str(uuid4())
         account_number = str(int(uuid4()))[:6]
         logging.debug(f"Account number: {account_number}")
-        hashed_account_number = hashlib.sha256(account_number.encode()).hexdigest()
+        salt = os.urandom(16).hex()
+        hashed_account_number = hashlib.sha256((account_number + salt).encode()).hexdigest()
         encrypted_account_number = encrypt_account_number(account_number).decode('utf-8')
-        currency = Currency.USD.value
-        balance = 2000
+        currency = Currency.USD.value 
+        balance = 0  # change it to other default value that will be config
         account_type = AccountType.CHECKINGS.value
         created_at = datetime.datetime.now()
         status = Status.ACTIVE.value
         
         cursor, conn = get_db_connection()
-        if cursor is None or conn is None:
-            raise DatabaseConnectionError
-        
-        # Enabling Auto Commit feature
-        conn.autocommit = True
         
         cursor.execute("""
             INSERT INTO bank_accounts (id, user_id, account_number, balance, type, currency, created_at, status, hashed_account_number) 
@@ -111,18 +107,13 @@ def create_bank_account():
     except UserNotFoundError as e:
         return jsonify({'error' : 'User not found'}), 404
     except Exception as e:
-        return jsonify({'error', 'Internal Erorr'}), 500
+        return jsonify({'error': 'Internal Error'}), 500
     
-    return jsonify({'account_id': account_id, 'account_number': encrypted_account_number, 'created_at':created_at}), 201
+    return jsonify({'account_id': account_id, 'account_number': encrypted_account_number, 'created_at': created_at}), 201
 
     
 @bank_accounts_bp.route('/bank_accounts/transfer', methods=['POST'])
-def transfer():
-    logging.debug("Transfer function called")
-    logging.debug(f"Request method: {request.method}")
-    logging.debug(f"Request path: {request.path}")
-    logging.debug(f"Request JSON: {request.get_json()}")
-    
+def transfer():    
     data = request.get_json()
     transfer_id = str(uuid4())
     to_account_number = data.get('to_account_number')
@@ -138,21 +129,17 @@ def transfer():
         return jsonify({'error': 'Invalid transaction type'}), 400
     
     try:
+        if amount <= 0:
+            return jsonify({'error': 'Amount must be positive'}), 400
+        
         from_account_id = get_account_id_by_user_id(g.current_user_id)
         logging.debug(f"From account ID: {from_account_id}")
         
         if not from_account_id:
             raise AccountNotFoundError("Account not found for the current user")
         
-        if amount <= 0:
-            return jsonify({'error': 'Amount must be positive'}), 400
-        
-        cursor, conn = get_db_connection()
-        if cursor is None or conn is None:
-            raise DatabaseConnectionError("Failed to connect to db.")
-        
-        conn.autocommit = True
-        
+        cursor, conn = get_db_connection() 
+                
         # Check if the sender's account exists
         cursor.execute("SELECT balance FROM bank_accounts WHERE id = %s", (from_account_id,))
         sender_account = cursor.fetchone()
