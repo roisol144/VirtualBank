@@ -54,9 +54,10 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: |
-          source venv/bin/activate
+          python -m venv venv          
+          source venv/bin/activate     
           pip install -r requirements.txt
-          
+      
       - name: Lint with Flake8
         run: |
           source venv/bin/activate
@@ -64,4 +65,5 @@ jobs:
       
       - name: Tests
         run: |
+          source venv/bin/activate
           python test_app.py

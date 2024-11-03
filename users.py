@@ -48,24 +48,26 @@ def register():
 
     # Connect to the database and insert new user (handle database exceptions)
     try:
-        # psycopg2 sql injection
         cursor, conn = get_db_connection()
-        
+        cursor.execute("BEGIN;")
         cursor.execute("""
             INSERT INTO users (id, first_name, last_name, email, password_hash, created_at, updated_at) 
             VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
         """, (user_id, data['first_name'], data['last_name'], email, hashed_password, str(created_at), str(updated_at)))
+        conn.commit()
         cursor.close()
         conn.close()
 
+
+    except UniqueViolation as UV:
+        logging.debug(f"Unique constraint violation for email {email}: {UV}")
+        conn.rollback()
+        return jsonify({'error': 'Try another email.'}), 409
+    
     except Exception as e:
         logging.debug("Error creating user: ", exc_info=True)
         return jsonify({'error': 'Internal Error'}), 500
     
-    except UniqueViolation as UV:
-        logging.debug(f"Unique constraint violation for email {email}: {UV}")
-        return jsonify({'error': 'Try another email.'}), 409
-
     # Return the created user data
     return jsonify({'id': user_id, 'first_name': data['first_name'], 'last_name': data['last_name'], 'email': data['email']}), 201
 
