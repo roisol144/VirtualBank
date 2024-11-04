@@ -28,7 +28,7 @@ jobs:
           --health-retries 5
 
     env:
-      DATABASE_URL: postgres://postgres:solo6755@postgres:5432/postgres
+      DATABASE_URL: postgres://postgres:solo6755@postgres:5432/postgres # replace with demo postgres using sqlite or something like a mock
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
       FERNET_KEY: ${{ secrets.FERNET_KEY }}
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE20: 'true'
@@ -54,17 +54,16 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: |
-          source venv/bin/activate
+          python -m venv venv          
+          source venv/bin/activate     
           pip install -r requirements.txt
-
-      # Install Flake8
-      - name: Install Flake8
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          pip install flake8
-
+      
       - name: Lint with Flake8
         run: |
           source venv/bin/activate
-          flake8 . --exclude=venv --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+      
+      - name: Tests
+        run: |
+          source venv/bin/activate
+          python test_app.py

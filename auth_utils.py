@@ -4,13 +4,21 @@ from flask import request, jsonify
 from functools import wraps
 import logging
 import os
+import hashlib
+from dotenv import load_dotenv
 from cryptography.fernet import Fernet
+load_dotenv()
 
 SECRET_KEY = os.environ.get('SECRET_KEY')
 # Keys
-ferney_key = os.environ.get('FERNET_KEY')
-fernet = Fernet(ferney_key.encode())
-TOKEN_EXPIRATION_HOURS = os.environ.get('TOKEN_EXPIRATION_HOURS')
+fernet_key = os.environ.get('FERNET_KEY')
+
+# Check if fernet_key is None and raise an error if it is
+if fernet_key is None:
+    raise ValueError("FERNET_KEY not found in environment variables.")
+
+fernet = Fernet(fernet_key.encode())
+TOKEN_EXPIRATION_HOURS = int(os.environ.get('TOKEN_EXPIRATION_HOURS'))
 
 # logging config
 logging.basicConfig(level=logging.DEBUG, 
@@ -32,7 +40,7 @@ def verify_token(token):
         logging.debug(f"Authentication token valid for user {payload['sub']}")
         return payload['sub']
     except jwt.ExpiredSignatureError:
-        logging.debug(f"Token Expired for user {payload['sub']}.")
+        logging.debug("Token Expired.")
         return None
     except jwt.InvalidTokenError:
         logging.debug("Invalid token was supplied.")
@@ -42,6 +50,17 @@ def verify_token(token):
 def encrypt_account_number(account_number):
     encrypted_account_number = fernet.encrypt(account_number.encode())
     return encrypted_account_number
+
+def hash_account_number(account_number):
+    salt = os.getenv('SALT')
+    if salt is None:
+        raise ValueError("SALT not found in environment variables.")
+    
+    if not isinstance(account_number, str):
+        raise ValueError("Account number must be a string.")
+    
+    hashed_account_number = hashlib.sha256((account_number + salt).encode()).hexdigest()
+    return hashed_account_number
       
     
     

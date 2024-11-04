@@ -19,7 +19,7 @@ users_bp = Blueprint('users', __name__)
 bcrypt = Bcrypt()
 
     
-@users_bp.route('/register', methods=['POST'])
+@users_bp.route('/users/register', methods=['POST'])
 def register():
     data = request.get_json()
     
@@ -33,6 +33,7 @@ def register():
     email = data['email'].strip().lower() # email - not case sensitive, without spaces
     email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
     if not re.match(email_regex, email):
+        logging.debug("Email format is invalid.")
         return jsonify({'error:', 'Invalid email format'}), 400
 
     password = data['password'].strip()
@@ -47,33 +48,31 @@ def register():
 
     # Connect to the database and insert new user (handle database exceptions)
     try:
-        # psycopg2 sql injection
         cursor, conn = get_db_connection()
-        if cursor is None or conn is None:
-            return jsonify({'error' : 'Internal Error' }), 500
-        
+        cursor.execute("BEGIN;")
         cursor.execute("""
             INSERT INTO users (id, first_name, last_name, email, password_hash, created_at, updated_at) 
             VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id;
         """, (user_id, data['first_name'], data['last_name'], email, hashed_password, str(created_at), str(updated_at)))
-        
-        conn.commit() 
+        conn.commit()
         cursor.close()
         conn.close()
 
+
+    except UniqueViolation as UV:
+        logging.debug(f"Unique constraint violation for email {email}: {UV}")
+        conn.rollback()
+        return jsonify({'error': 'Try another email.'}), 409
+    
     except Exception as e:
         logging.debug("Error creating user: ", exc_info=True)
         return jsonify({'error': 'Internal Error'}), 500
     
-    except UniqueViolation as UV:
-        logging.debug(f"Unique constraint violation for email {email}: {UV}")
-        return jsonify({'error': 'Try another email.'}), 409
-
     # Return the created user data
     return jsonify({'id': user_id, 'first_name': data['first_name'], 'last_name': data['last_name'], 'email': data['email']}), 201
 
 # Get User
-@users_bp.route('/get_user', methods=['GET']) 
+@users_bp.route('/users', methods=['GET']) 
 def get_user():
     #data = request.get_json() 
     email = request.args.get('email') 
@@ -99,12 +98,27 @@ def get_user():
     except Exception as e:
         return jsonify({'error': 'An unexpected error occurred.'}), 500
 
-@users_bp.route('/login', methods=['POST'])
+@users_bp.route('/users/login', methods=['POST'])
 def login():
     data = request.get_json()
+    
+    # Input validation
+    if not data or 'email' not in data or 'password' not in data:
+        return jsonify({'error': 'Email and password are required.'}), 400
+    
     email = data.get('email')
     password = data.get('password')
-    user = get_user_by_email(email) # Get USER
+
+    try:
+        user = get_user_by_email(email)  # Get USER
+    except UserNotFoundError:
+        return jsonify({'error': 'User Not Found'}), 404
+    except DatabaseConnectionError:
+        logging.error("Couldn't connect to server", exc_info=True)
+        return jsonify({'error': 'Internal Error'}), 500
+    except Exception as e:
+        logging.error("An unexpected error occurred", exc_info=True)
+        return jsonify({'error': 'An unexpected error occurred.'}), 500
 
     if user and bcrypt.check_password_hash(user['password_hash'], password):
         login_time = datetime.datetime.now()
@@ -112,7 +126,7 @@ def login():
         logging.debug(f"user with email {email} logged in at {login_time}...")
         return jsonify({
             'message': 'Logged In Successfully',
-            'toekn': token
+            'token': token  
         }), 200
     else:
         return jsonify({'error': 'Invalid email or password.'}), 401
