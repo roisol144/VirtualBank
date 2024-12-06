@@ -1,0 +1,332 @@
+2024-10-27 17:04:56,810 - test_app - ERROR - Exception on /bank_accounts [POST]
+Traceback (most recent call last):
+  File "/Users/roisolomon/Documents/DEV/VirtualBank/bank_accounts.py", line 68, in create_bank_account
+    account_number = str(uuid4().int)[:6]
+AttributeError: 'str' object has no attribute 'int'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/Users/roisolomon/Documents/DEV/VirtualBank/bank_accounts.py", line 98, in create_bank_account
+    return jsonify({'error', 'Internal Erorr'}), 500
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/__init__.py", line 234, in dumps
+    return cls(
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/encoder.py", line 199, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/encoder.py", line 257, in iterencode
+    return _iterencode(o, 0)
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type set is not JSON serializable
+2024-10-27 17:04:56,820 - root - DEBUG - user with email john@example.com logged in at 2024-10-27 17:04:56.820017...
+2024-10-27 17:06:59,758 - test_app - ERROR - Exception on /bank_accounts [POST]
+Traceback (most recent call last):
+  File "/Users/roisolomon/Documents/DEV/VirtualBank/bank_accounts.py", line 68, in create_bank_account
+    account_number = str(uuid4().int)[:6]
+AttributeError: 'str' object has no attribute 'int'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/Users/roisolomon/Documents/DEV/VirtualBank/bank_accounts.py", line 98, in create_bank_account
+    return jsonify({'error', 'Internal Erorr'}), 500
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/__init__.py", line 234, in dumps
+    return cls(
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/encoder.py", line 199, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/encoder.py", line 257, in iterencode
+    return _iterencode(o, 0)
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type set is not JSON serializable
+2024-10-27 17:06:59,768 - root - DEBUG - user with email john@example.com logged in at 2024-10-27 17:06:59.768197...
+2024-10-28 10:23:27,326 - test_app - ERROR - Exception on /bank_accounts [POST]
+Traceback (most recent call last):
+  File "/Users/roisolomon/Documents/DEV/VirtualBank/bank_accounts.py", line 68, in create_bank_account
+    account_number = str(uuid4().int)[:6]
+AttributeError: 'str' object has no attribute 'int'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/Users/roisolomon/Documents/DEV/VirtualBank/bank_accounts.py", line 98, in create_bank_account
+    return jsonify({'error', 'Internal Erorr'}), 500
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/__init__.py", line 234, in dumps
+    return cls(
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/encoder.py", line 199, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/encoder.py", line 257, in iterencode
+    return _iterencode(o, 0)
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type set is not JSON serializable
+2024-10-28 10:23:27,338 - root - DEBUG - user with email john@example.com logged in at 2024-10-28 10:23:27.338381...
+2024-10-28 10:35:54,631 - test_app - ERROR - Exception on /bank_accounts [POST]
+Traceback (most recent call last):
+  File "/Users/roisolomon/Documents/DEV/VirtualBank/bank_accounts.py", line 68, in create_bank_account
+    account_number = str(uuid4().int % 10**6).zfill(6)
+AttributeError: 'str' object has no attribute 'int'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/Users/roisolomon/Documents/DEV/VirtualBank/bank_accounts.py", line 98, in create_bank_account
+    return jsonify({'error', 'Internal Erorr'}), 500
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/__init__.py", line 170, in jsonify
+    return current_app.json.response(*args, **kwargs)  # type: ignore[return-value]
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 214, in response
+    f"{self.dumps(obj, **dump_args)}\n", mimetype=self.mimetype
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 179, in dumps
+    return json.dumps(obj, **kwargs)
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/__init__.py", line 234, in dumps
+    return cls(
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/encoder.py", line 199, in encode
+    chunks = self.iterencode(o, _one_shot=True)
+  File "/Users/roisolomon/micromamba/lib/python3.9/json/encoder.py", line 257, in iterencode
+    return _iterencode(o, 0)
+  File "/Users/roisolomon/micromamba/lib/python3.9/site-packages/flask/json/provider.py", line 121, in _default
+    raise TypeError(f"Object of type {type(o).__name__} is not JSON serializable")
+TypeError: Object of type set is not JSON serializable
+2024-10-28 10:35:54,641 - root - DEBUG - user with email john@example.com logged in at 2024-10-28 10:35:54.641572...
+2024-10-28 10:45:49,272 - root - DEBUG - Account number: 123
+2024-10-28 10:45:49,282 - root - DEBUG - user with email john@example.com logged in at 2024-10-28 10:45:49.282277...
+2024-10-28 11:09:00,234 - root - DEBUG - Account number: 123
+2024-10-28 11:09:00,242 - root - DEBUG - user with email john@example.com logged in at 2024-10-28 11:09:00.242962...
+2024-11-03 14:37:48,771 - faker.factory - DEBUG - Not in REPL -> leaving logger event level as is.
+2024-11-03 14:37:48,776 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.address`.
+2024-11-03 14:37:48,778 - faker.factory - DEBUG - Provider `faker.providers.address` has been localized to `en_US`.
+2024-11-03 14:37:48,778 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.automotive`.
+2024-11-03 14:37:48,779 - faker.factory - DEBUG - Provider `faker.providers.automotive` has been localized to `en_US`.
+2024-11-03 14:37:48,779 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.bank`.
+2024-11-03 14:37:48,780 - faker.factory - DEBUG - Specified locale `en_US` is not available for provider `faker.providers.bank`. Locale reset to `en_GB` for this provider.
+2024-11-03 14:37:48,780 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.barcode`.
+2024-11-03 14:37:48,780 - faker.factory - DEBUG - Provider `faker.providers.barcode` has been localized to `en_US`.
+2024-11-03 14:37:48,781 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.color`.
+2024-11-03 14:37:48,781 - faker.factory - DEBUG - Provider `faker.providers.color` has been localized to `en_US`.
+2024-11-03 14:37:48,781 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.company`.
+2024-11-03 14:37:48,782 - faker.factory - DEBUG - Provider `faker.providers.company` has been localized to `en_US`.
+2024-11-03 14:37:48,782 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.credit_card`.
+2024-11-03 14:37:48,782 - faker.factory - DEBUG - Provider `faker.providers.credit_card` has been localized to `en_US`.
+2024-11-03 14:37:48,783 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.currency`.
+2024-11-03 14:37:48,783 - faker.factory - DEBUG - Provider `faker.providers.currency` has been localized to `en_US`.
+2024-11-03 14:37:48,783 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.date_time`.
+2024-11-03 14:37:48,784 - faker.factory - DEBUG - Provider `faker.providers.date_time` has been localized to `en_US`.
+2024-11-03 14:37:48,784 - faker.factory - DEBUG - Provider `faker.providers.emoji` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:37:48,784 - faker.factory - DEBUG - Provider `faker.providers.file` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:37:48,784 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.geo`.
+2024-11-03 14:37:48,785 - faker.factory - DEBUG - Provider `faker.providers.geo` has been localized to `en_US`.
+2024-11-03 14:37:48,785 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.internet`.
+2024-11-03 14:37:48,786 - faker.factory - DEBUG - Provider `faker.providers.internet` has been localized to `en_US`.
+2024-11-03 14:37:48,786 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.isbn`.
+2024-11-03 14:37:48,786 - faker.factory - DEBUG - Provider `faker.providers.isbn` has been localized to `en_US`.
+2024-11-03 14:37:48,786 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.job`.
+2024-11-03 14:37:48,787 - faker.factory - DEBUG - Provider `faker.providers.job` has been localized to `en_US`.
+2024-11-03 14:37:48,787 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.lorem`.
+2024-11-03 14:37:48,787 - faker.factory - DEBUG - Provider `faker.providers.lorem` has been localized to `en_US`.
+2024-11-03 14:37:48,787 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.misc`.
+2024-11-03 14:37:48,787 - faker.factory - DEBUG - Provider `faker.providers.misc` has been localized to `en_US`.
+2024-11-03 14:37:48,788 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.passport`.
+2024-11-03 14:37:48,788 - faker.factory - DEBUG - Provider `faker.providers.passport` has been localized to `en_US`.
+2024-11-03 14:37:48,788 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.person`.
+2024-11-03 14:37:48,789 - faker.factory - DEBUG - Provider `faker.providers.person` has been localized to `en_US`.
+2024-11-03 14:37:48,791 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.phone_number`.
+2024-11-03 14:37:48,792 - faker.factory - DEBUG - Provider `faker.providers.phone_number` has been localized to `en_US`.
+2024-11-03 14:37:48,792 - faker.factory - DEBUG - Provider `faker.providers.profile` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:37:48,792 - faker.factory - DEBUG - Provider `faker.providers.python` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:37:48,792 - faker.factory - DEBUG - Provider `faker.providers.sbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:37:48,792 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.ssn`.
+2024-11-03 14:37:48,793 - faker.factory - DEBUG - Provider `faker.providers.ssn` has been localized to `en_US`.
+2024-11-03 14:37:48,793 - faker.factory - DEBUG - Provider `faker.providers.user_agent` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:37:48,795 - root - DEBUG - Account number: 585330
+2024-11-03 14:37:48,813 - root - DEBUG - user with email lisa87@example.net logged in at 2024-11-03 14:37:48.813811...
+2024-11-03 14:40:17,188 - faker.factory - DEBUG - Not in REPL -> leaving logger event level as is.
+2024-11-03 14:40:17,195 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.address`.
+2024-11-03 14:40:17,196 - faker.factory - DEBUG - Provider `faker.providers.address` has been localized to `en_US`.
+2024-11-03 14:40:17,197 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.automotive`.
+2024-11-03 14:40:17,198 - faker.factory - DEBUG - Provider `faker.providers.automotive` has been localized to `en_US`.
+2024-11-03 14:40:17,198 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.bank`.
+2024-11-03 14:40:17,199 - faker.factory - DEBUG - Specified locale `en_US` is not available for provider `faker.providers.bank`. Locale reset to `en_GB` for this provider.
+2024-11-03 14:40:17,199 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.barcode`.
+2024-11-03 14:40:17,200 - faker.factory - DEBUG - Provider `faker.providers.barcode` has been localized to `en_US`.
+2024-11-03 14:40:17,200 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.color`.
+2024-11-03 14:40:17,201 - faker.factory - DEBUG - Provider `faker.providers.color` has been localized to `en_US`.
+2024-11-03 14:40:17,201 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.company`.
+2024-11-03 14:40:17,202 - faker.factory - DEBUG - Provider `faker.providers.company` has been localized to `en_US`.
+2024-11-03 14:40:17,203 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.credit_card`.
+2024-11-03 14:40:17,203 - faker.factory - DEBUG - Provider `faker.providers.credit_card` has been localized to `en_US`.
+2024-11-03 14:40:17,203 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.currency`.
+2024-11-03 14:40:17,204 - faker.factory - DEBUG - Provider `faker.providers.currency` has been localized to `en_US`.
+2024-11-03 14:40:17,204 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.date_time`.
+2024-11-03 14:40:17,205 - faker.factory - DEBUG - Provider `faker.providers.date_time` has been localized to `en_US`.
+2024-11-03 14:40:17,205 - faker.factory - DEBUG - Provider `faker.providers.emoji` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:40:17,206 - faker.factory - DEBUG - Provider `faker.providers.file` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:40:17,206 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.geo`.
+2024-11-03 14:40:17,206 - faker.factory - DEBUG - Provider `faker.providers.geo` has been localized to `en_US`.
+2024-11-03 14:40:17,206 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.internet`.
+2024-11-03 14:40:17,207 - faker.factory - DEBUG - Provider `faker.providers.internet` has been localized to `en_US`.
+2024-11-03 14:40:17,208 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.isbn`.
+2024-11-03 14:40:17,208 - faker.factory - DEBUG - Provider `faker.providers.isbn` has been localized to `en_US`.
+2024-11-03 14:40:17,208 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.job`.
+2024-11-03 14:40:17,209 - faker.factory - DEBUG - Provider `faker.providers.job` has been localized to `en_US`.
+2024-11-03 14:40:17,209 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.lorem`.
+2024-11-03 14:40:17,210 - faker.factory - DEBUG - Provider `faker.providers.lorem` has been localized to `en_US`.
+2024-11-03 14:40:17,210 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.misc`.
+2024-11-03 14:40:17,210 - faker.factory - DEBUG - Provider `faker.providers.misc` has been localized to `en_US`.
+2024-11-03 14:40:17,211 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.passport`.
+2024-11-03 14:40:17,211 - faker.factory - DEBUG - Provider `faker.providers.passport` has been localized to `en_US`.
+2024-11-03 14:40:17,211 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.person`.
+2024-11-03 14:40:17,213 - faker.factory - DEBUG - Provider `faker.providers.person` has been localized to `en_US`.
+2024-11-03 14:40:17,214 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.phone_number`.
+2024-11-03 14:40:17,216 - faker.factory - DEBUG - Provider `faker.providers.phone_number` has been localized to `en_US`.
+2024-11-03 14:40:17,216 - faker.factory - DEBUG - Provider `faker.providers.profile` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:40:17,216 - faker.factory - DEBUG - Provider `faker.providers.python` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:40:17,216 - faker.factory - DEBUG - Provider `faker.providers.sbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:40:17,216 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.ssn`.
+2024-11-03 14:40:17,218 - faker.factory - DEBUG - Provider `faker.providers.ssn` has been localized to `en_US`.
+2024-11-03 14:40:17,218 - faker.factory - DEBUG - Provider `faker.providers.user_agent` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 14:40:17,220 - root - DEBUG - Account number: 135936
+2024-11-03 14:40:17,244 - root - DEBUG - user with email wrighttodd@example.com logged in at 2024-11-03 14:40:17.244164...
+2024-11-03 19:40:50,351 - faker.factory - DEBUG - Not in REPL -> leaving logger event level as is.
+2024-11-03 19:40:50,356 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.address`.
+2024-11-03 19:40:50,357 - faker.factory - DEBUG - Provider `faker.providers.address` has been localized to `en_US`.
+2024-11-03 19:40:50,358 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.automotive`.
+2024-11-03 19:40:50,359 - faker.factory - DEBUG - Provider `faker.providers.automotive` has been localized to `en_US`.
+2024-11-03 19:40:50,360 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.bank`.
+2024-11-03 19:40:50,360 - faker.factory - DEBUG - Specified locale `en_US` is not available for provider `faker.providers.bank`. Locale reset to `en_GB` for this provider.
+2024-11-03 19:40:50,361 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.barcode`.
+2024-11-03 19:40:50,361 - faker.factory - DEBUG - Provider `faker.providers.barcode` has been localized to `en_US`.
+2024-11-03 19:40:50,361 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.color`.
+2024-11-03 19:40:50,362 - faker.factory - DEBUG - Provider `faker.providers.color` has been localized to `en_US`.
+2024-11-03 19:40:50,362 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.company`.
+2024-11-03 19:40:50,363 - faker.factory - DEBUG - Provider `faker.providers.company` has been localized to `en_US`.
+2024-11-03 19:40:50,363 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.credit_card`.
+2024-11-03 19:40:50,364 - faker.factory - DEBUG - Provider `faker.providers.credit_card` has been localized to `en_US`.
+2024-11-03 19:40:50,364 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.currency`.
+2024-11-03 19:40:50,364 - faker.factory - DEBUG - Provider `faker.providers.currency` has been localized to `en_US`.
+2024-11-03 19:40:50,365 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.date_time`.
+2024-11-03 19:40:50,366 - faker.factory - DEBUG - Provider `faker.providers.date_time` has been localized to `en_US`.
+2024-11-03 19:40:50,366 - faker.factory - DEBUG - Provider `faker.providers.emoji` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 19:40:50,366 - faker.factory - DEBUG - Provider `faker.providers.file` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 19:40:50,366 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.geo`.
+2024-11-03 19:40:50,366 - faker.factory - DEBUG - Provider `faker.providers.geo` has been localized to `en_US`.
+2024-11-03 19:40:50,367 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.internet`.
+2024-11-03 19:40:50,368 - faker.factory - DEBUG - Provider `faker.providers.internet` has been localized to `en_US`.
+2024-11-03 19:40:50,368 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.isbn`.
+2024-11-03 19:40:50,368 - faker.factory - DEBUG - Provider `faker.providers.isbn` has been localized to `en_US`.
+2024-11-03 19:40:50,368 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.job`.
+2024-11-03 19:40:50,369 - faker.factory - DEBUG - Provider `faker.providers.job` has been localized to `en_US`.
+2024-11-03 19:40:50,369 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.lorem`.
+2024-11-03 19:40:50,370 - faker.factory - DEBUG - Provider `faker.providers.lorem` has been localized to `en_US`.
+2024-11-03 19:40:50,370 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.misc`.
+2024-11-03 19:40:50,370 - faker.factory - DEBUG - Provider `faker.providers.misc` has been localized to `en_US`.
+2024-11-03 19:40:50,370 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.passport`.
+2024-11-03 19:40:50,370 - faker.factory - DEBUG - Provider `faker.providers.passport` has been localized to `en_US`.
+2024-11-03 19:40:50,371 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.person`.
+2024-11-03 19:40:50,372 - faker.factory - DEBUG - Provider `faker.providers.person` has been localized to `en_US`.
+2024-11-03 19:40:50,374 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.phone_number`.
+2024-11-03 19:40:50,375 - faker.factory - DEBUG - Provider `faker.providers.phone_number` has been localized to `en_US`.
+2024-11-03 19:40:50,375 - faker.factory - DEBUG - Provider `faker.providers.profile` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 19:40:50,375 - faker.factory - DEBUG - Provider `faker.providers.python` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 19:40:50,375 - faker.factory - DEBUG - Provider `faker.providers.sbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 19:40:50,375 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.ssn`.
+2024-11-03 19:40:50,376 - faker.factory - DEBUG - Provider `faker.providers.ssn` has been localized to `en_US`.
+2024-11-03 19:40:50,377 - faker.factory - DEBUG - Provider `faker.providers.user_agent` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-03 19:40:50,379 - root - DEBUG - Account number: 593566
+2024-11-03 19:40:50,396 - root - DEBUG - user with email cmarshall@example.org logged in at 2024-11-03 19:40:50.396816...
+2024-11-04 16:54:08,191 - faker.factory - DEBUG - Not in REPL -> leaving logger event level as is.
+2024-11-04 16:54:08,196 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.address`.
+2024-11-04 16:54:08,197 - faker.factory - DEBUG - Provider `faker.providers.address` has been localized to `en_US`.
+2024-11-04 16:54:08,198 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.automotive`.
+2024-11-04 16:54:08,199 - faker.factory - DEBUG - Provider `faker.providers.automotive` has been localized to `en_US`.
+2024-11-04 16:54:08,200 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.bank`.
+2024-11-04 16:54:08,200 - faker.factory - DEBUG - Specified locale `en_US` is not available for provider `faker.providers.bank`. Locale reset to `en_GB` for this provider.
+2024-11-04 16:54:08,201 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.barcode`.
+2024-11-04 16:54:08,201 - faker.factory - DEBUG - Provider `faker.providers.barcode` has been localized to `en_US`.
+2024-11-04 16:54:08,201 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.color`.
+2024-11-04 16:54:08,202 - faker.factory - DEBUG - Provider `faker.providers.color` has been localized to `en_US`.
+2024-11-04 16:54:08,202 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.company`.
+2024-11-04 16:54:08,203 - faker.factory - DEBUG - Provider `faker.providers.company` has been localized to `en_US`.
+2024-11-04 16:54:08,204 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.credit_card`.
+2024-11-04 16:54:08,204 - faker.factory - DEBUG - Provider `faker.providers.credit_card` has been localized to `en_US`.
+2024-11-04 16:54:08,204 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.currency`.
+2024-11-04 16:54:08,205 - faker.factory - DEBUG - Provider `faker.providers.currency` has been localized to `en_US`.
+2024-11-04 16:54:08,205 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.date_time`.
+2024-11-04 16:54:08,206 - faker.factory - DEBUG - Provider `faker.providers.date_time` has been localized to `en_US`.
+2024-11-04 16:54:08,206 - faker.factory - DEBUG - Provider `faker.providers.emoji` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-04 16:54:08,206 - faker.factory - DEBUG - Provider `faker.providers.file` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-04 16:54:08,206 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.geo`.
+2024-11-04 16:54:08,207 - faker.factory - DEBUG - Provider `faker.providers.geo` has been localized to `en_US`.
+2024-11-04 16:54:08,207 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.internet`.
+2024-11-04 16:54:08,208 - faker.factory - DEBUG - Provider `faker.providers.internet` has been localized to `en_US`.
+2024-11-04 16:54:08,208 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.isbn`.
+2024-11-04 16:54:08,208 - faker.factory - DEBUG - Provider `faker.providers.isbn` has been localized to `en_US`.
+2024-11-04 16:54:08,208 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.job`.
+2024-11-04 16:54:08,209 - faker.factory - DEBUG - Provider `faker.providers.job` has been localized to `en_US`.
+2024-11-04 16:54:08,209 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.lorem`.
+2024-11-04 16:54:08,210 - faker.factory - DEBUG - Provider `faker.providers.lorem` has been localized to `en_US`.
+2024-11-04 16:54:08,210 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.misc`.
+2024-11-04 16:54:08,210 - faker.factory - DEBUG - Provider `faker.providers.misc` has been localized to `en_US`.
+2024-11-04 16:54:08,211 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.passport`.
+2024-11-04 16:54:08,211 - faker.factory - DEBUG - Provider `faker.providers.passport` has been localized to `en_US`.
+2024-11-04 16:54:08,211 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.person`.
+2024-11-04 16:54:08,212 - faker.factory - DEBUG - Provider `faker.providers.person` has been localized to `en_US`.
+2024-11-04 16:54:08,214 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.phone_number`.
+2024-11-04 16:54:08,215 - faker.factory - DEBUG - Provider `faker.providers.phone_number` has been localized to `en_US`.
+2024-11-04 16:54:08,216 - faker.factory - DEBUG - Provider `faker.providers.profile` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-04 16:54:08,216 - faker.factory - DEBUG - Provider `faker.providers.python` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-04 16:54:08,216 - faker.factory - DEBUG - Provider `faker.providers.sbn` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-04 16:54:08,216 - faker.factory - DEBUG - Looking for locale `en_US` in provider `faker.providers.ssn`.
+2024-11-04 16:54:08,217 - faker.factory - DEBUG - Provider `faker.providers.ssn` has been localized to `en_US`.
+2024-11-04 16:54:08,217 - faker.factory - DEBUG - Provider `faker.providers.user_agent` does not feature localization. Specified locale `en_US` is not utilized for this provider.
+2024-11-04 16:54:08,220 - root - DEBUG - Account number: 592292
+2024-11-04 16:54:08,237 - root - DEBUG - user with email omendez@example.org logged in at 2024-11-04 16:54:08.237475...
