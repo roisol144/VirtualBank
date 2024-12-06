@@ -1,7 +1,3 @@
-Got it! Here's a `README.md` specifically for the `backend` directory of your project. It will focus on the backend services without repeating information already in the main `README.md`:
-
----
-
 # Backend for VirtualBank
 
 This is the backend component of the **VirtualBank** project, developed using **Flask** and **PostgreSQL**. The backend handles user management, account creation, and transactions, providing RESTful APIs to interact with the data.
