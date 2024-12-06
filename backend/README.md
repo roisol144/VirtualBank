@@ -104,5 +104,3 @@ pytest
 This will run all the backend tests to ensure that everything works as expected.
 
 ---
-
-Let me know if you need further adjustments or additional sections for the backend `README.md`!
